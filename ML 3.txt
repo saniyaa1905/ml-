@@ -1,0 +1,179 @@
+
+# ML PRACTICAL 3
+# Diabetes Prediction using K-Nearest Neighbors (KNN)
+#
+# AIM:
+# To implement KNN algorithm on diabetes.csv dataset
+# and calculate confusion matrix, accuracy, error rate,
+# precision and recall.
+
+
+# THEORY:
+# KNN is a supervised machine learning algorithm.
+# It predicts the class of a data point by finding
+# its K nearest neighbours and selecting the majority class.
+
+
+# FEATURES USED:
+# 1. Pregnancies: Number of times pregnant.
+# 2. Glucose: Plasma glucose concentration.
+# 3. BloodPressure: Diastolic blood pressure.
+# 4. SkinThickness: Triceps skin fold thickness.
+# 5. Insulin: Two-hour serum insulin.
+# 6. BMI: Body Mass Index.
+# 7. DiabetesPedigreeFunction: Family-history-related
+#    diabetes risk indicator.
+# 8. Age: Age of the person.
+# 9. Outcome: Target variable.
+#    0 = Non-diabetic
+#    1 = Diabetic
+
+
+# STEP 1: Import required libraries
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import confusion_matrix, accuracy_score
+from sklearn.metrics import precision_score, recall_score
+
+
+# STEP 2: Load the diabetes dataset
+
+df = pd.read_csv('diabetes.csv')
+
+# Display first five records
+print("First Five Records:")
+print(df.head())
+
+
+# STEP 3: Display dataset information
+
+print("\nDataset Information:")
+df.info()
+
+
+# STEP 4: Check for missing values
+
+print("\nMissing Values:")
+print(df.isnull().sum())
+
+
+# STEP 5: Separate independent and dependent variables
+
+# X contains input features
+X = df.drop('Outcome', axis=1)
+
+# y contains the target/output column
+y = df['Outcome']
+
+print("\nIndependent Variables:")
+print(X.head())
+
+print("\nDependent Variable:")
+print(y.head())
+
+
+# STEP 6: Split dataset into training and testing sets
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y,
+    test_size=0.2,
+    random_state=42,
+    stratify=y
+)
+
+# Display training and testing dimensions
+print("\nTraining Data Shape:", X_train.shape)
+print("Testing Data Shape:", X_test.shape)
+
+
+# STEP 7: Normalize the training and testing data
+
+scaler = StandardScaler()
+
+# Fit scaler on training data and transform it
+X_train = scaler.fit_transform(X_train)
+
+# Transform testing data using the same scaler
+X_test = scaler.transform(X_test)
+
+
+# STEP 8: Create and train the KNN model
+
+# Create KNN model with 5 nearest neighbours
+knn = KNeighborsClassifier(n_neighbors=5)
+
+# Train the model
+knn.fit(X_train, y_train)
+
+
+# STEP 9: Predict the output
+
+# Predict diabetes outcomes for testing data
+y_pred = knn.predict(X_test)
+
+print("\nPredicted Values:")
+print(y_pred)
+
+
+# STEP 10: Calculate and display confusion matrix
+
+cm = confusion_matrix(y_test, y_pred)
+
+print("\nConfusion Matrix:")
+print(cm)
+
+
+# STEP 11: Calculate accuracy, error rate,
+# precision and recall
+
+accuracy = accuracy_score(y_test, y_pred)
+
+error_rate = 1 - accuracy
+
+precision = precision_score(
+    y_test, y_pred, zero_division=0
+)
+
+recall = recall_score(
+    y_test, y_pred, zero_division=0
+)
+
+print("\nAccuracy:", accuracy)
+print("Error Rate:", error_rate)
+print("Precision:", precision)
+print("Recall:", recall)
+
+
+# STEP 12: Visualize the confusion matrix
+
+plt.figure(figsize=(6, 4))
+
+sns.heatmap(
+    cm,
+    annot=True,
+    fmt='d',
+    cmap='Blues'
+)
+
+plt.xlabel("Predicted Values")
+plt.ylabel("Actual Values")
+plt.title("KNN Confusion Matrix")
+
+plt.show()
+
+
+# CONCLUSION:
+# The K-Nearest Neighbors (KNN) algorithm was successfully
+# implemented on the diabetes dataset.
+# The dataset was divided into training and testing sets.
+# Feature scaling was performed using StandardScaler.
+# The model was trained using 5 nearest neighbours.
+# Its performance was evaluated using confusion matrix,
+# accuracy, error rate, precision and recall.
