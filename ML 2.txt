@@ -1,0 +1,136 @@
+
+# ML PRACTICAL 2
+# Email Spam Classification using KNN and SVM
+#
+# AIM:
+# To classify emails as Spam or Ham using
+# K-Nearest Neighbors (KNN) and Support Vector Machine (SVM).
+
+
+# STEP 1: Import required libraries
+
+import pandas as pd
+import numpy as np
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+
+
+# STEP 2: Read the dataset
+
+data = pd.read_csv("emails.csv")
+
+# Display first five records
+print("Dataset:")
+print(data.head())
+
+# Display dataset dimensions
+print("\nDataset Shape:", data.shape)
+
+
+# STEP 3: Separate features and target
+
+X = data.iloc[:, 1:-1]
+y = data.iloc[:, -1]
+
+print("\nFeatures Shape:", X.shape)
+print("Target Shape:", y.shape)
+
+
+# STEP 4: Check missing values
+
+print("\nMissing values in dataset:")
+print(data.isnull().sum())
+
+print("Total missing values:", data.isnull().sum().sum())
+
+
+# STEP 5: Handle missing values
+
+X = X.fillna(0)
+
+
+# STEP 6: Split dataset into training and testing sets
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.25,
+    random_state=42,
+    stratify=y
+)
+
+print("\nTraining data:", X_train.shape)
+print("Testing data:", X_test.shape)
+
+
+# STEP 7: Perform feature scaling
+
+scaler = StandardScaler()
+
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+
+# STEP 8: Apply K-Nearest Neighbors (KNN) algorithm
+
+knn = KNeighborsClassifier(n_neighbors=5)
+
+# Train the KNN model
+knn.fit(X_train, y_train)
+
+# Predict the output
+y_pred_knn = knn.predict(X_test)
+
+# Display KNN results
+print("\n----- KNN CLASSIFIER -----")
+
+print("Accuracy:", accuracy_score(y_test, y_pred_knn))
+
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred_knn))
+
+print("Classification Report:\n",
+      classification_report(y_test, y_pred_knn))
+
+
+# STEP 9: Apply Support Vector Machine (SVM) algorithm
+
+svm = SVC(kernel='linear')
+
+# Train the SVM model
+svm.fit(X_train, y_train)
+
+# Predict the output
+y_pred_svm = svm.predict(X_test)
+
+# Display SVM results
+print("\n----- SVM CLASSIFIER -----")
+
+print("Accuracy:", accuracy_score(y_test, y_pred_svm))
+
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred_svm))
+
+print("Classification Report:\n",
+      classification_report(y_test, y_pred_svm))
+
+
+# STEP 10: Compare model performance
+
+print("\n----- MODEL COMPARISON -----")
+
+print("KNN Accuracy:", accuracy_score(y_test, y_pred_knn))
+
+print("SVM Accuracy:", accuracy_score(y_test, y_pred_svm))
+
+
+# CONCLUSION:
+# Email spam classification was successfully implemented
+# using K-Nearest Neighbors (KNN) and Support Vector Machine (SVM).
+# Both models were trained and tested on the email dataset.
+# Their performance was evaluated using accuracy,
+# confusion matrix and classification report.
+# The accuracy of both models was compared to identify
+# the better-performing classifier.
