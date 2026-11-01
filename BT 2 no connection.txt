@@ -1,0 +1,206 @@
+BLOCKCHAIN TECHNOLOGY PRACTICAL 1
+Bank Account Smart Contract – Complete Exam Guide
+Problem Statement: Write a smart contract for a bank account of a customer to perform Deposit Money, Withdraw Money and Show Balance.
+PART A — EXACT STEPS TO PERFORM THE PRACTICAL
+Follow these steps in the same order during the practical exam. This guide assumes you are starting from a blank Remix workspace.
+Step 1: Open Remix IDE
+Open Remix IDE in the browser: https://app.remix.live/
+You do not need to sign in.
+Step 2: Create a Solidity File
+•	In the File Explorer, open the contracts folder (this is recommended for organization, but not compulsory).
+•	Click Create → New File.
+•	Name the file: SimpleBank.sol
+•	Click the new file to open the code editor.
+Step 3: Paste the Smart Contract Code
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract SimpleBank {
+
+    struct ClientAccount {
+        uint clientId;
+        address payable clientAddress;
+        uint balance;
+    }
+
+    ClientAccount[] public clients;
+
+    uint public clientCounter;
+    address public owner;
+    address payable public manager;
+
+    mapping(address => uint) public balances;
+    mapping(address => bool) public isClient;
+
+    constructor() {
+        owner = msg.sender;
+        clientCounter = 0;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only owner can call this!");
+        _;
+    }
+
+    modifier onlyManager() {
+        require(msg.sender == manager, "Only manager can call this!");
+        _;
+    }
+
+    modifier onlyClients() {
+        require(isClient[msg.sender], "Only clients can call this!");
+        _;
+    }
+
+    receive() external payable {}
+
+    function setManager(address payable managerAddress)
+        public
+        onlyOwner
+    {
+        require(managerAddress != address(0), "Invalid manager address");
+        manager = managerAddress;
+    }
+
+    function joinAsClient() public payable {
+        require(!isClient[msg.sender], "Already registered");
+
+        clients.push(
+            ClientAccount(clientCounter, payable(msg.sender), 0)
+        );
+
+        clientCounter++;
+        isClient[msg.sender] = true;
+    }
+
+    function deposit() public payable onlyClients {
+        require(msg.value > 0, "Deposit must be greater than zero");
+
+        balances[msg.sender] += msg.value;
+    }
+
+    function withdraw(uint amount) public onlyClients {
+        uint amountInWei = amount * 1 ether;
+
+        require(amount > 0, "Amount must be greater than zero");
+        require(
+            balances[msg.sender] >= amountInWei,
+            "Insufficient account balance"
+        );
+
+        balances[msg.sender] -= amountInWei;
+        payable(msg.sender).transfer(amountInWei);
+    }
+
+    function getBalance() public view onlyClients returns (uint) {
+        return balances[msg.sender] / 1 ether;
+    }
+
+    function getContractBalance() public view returns (uint) {
+        return address(this).balance / 1 ether;
+    }
+
+    function sendInterest() public onlyManager {
+        require(
+            address(this).balance >= clients.length * 1 ether,
+            "Insufficient contract balance"
+        );
+
+        for (uint i = 0; i < clients.length; i++) {
+            address payable clientAddress = clients[i].clientAddress;
+
+            balances[clientAddress] += 1 ether;
+            clientAddress.transfer(1 ether);
+        }
+    }
+}
+Step 4: Compile the Contract
+1.	Click Compile in the left sidebar, or click the blue Compile button.
+2.	Make sure the compiler version is compatible with pragma solidity ^0.8.20 (a 0.8.x compiler is suitable).
+3.	Click Compile SimpleBank.sol.
+4.	Wait until Remix shows that the file is Compiled. If there is no red compilation error, continue.
+Step 5: Open Deploy & Run
+5.	Click Deploy in the left sidebar.
+6.	For Environment, select Remix VM.
+7.	The EVM version can remain as the default shown by Remix, such as Cancun.
+8.	Leave the first account selected initially.
+9.	Make sure the contract dropdown shows SimpleBank.
+10.	Click Deploy.
+Step 6: Set the Manager (Manual Structure)
+This contract includes a Manager because the implementation also contains manager functionality. Do this before testing the client account.
+11.	Copy the address of the currently selected first account.
+12.	Find setManager(address) under Deployed Contracts.
+13.	Paste the first account address into the input field.
+14.	Click Transact.
+Step 7: Select Account 2 and Register as Client
+15.	At the top of the Deploy panel, open the Account dropdown.
+16.	Select Account 2.
+17.	Find joinAsClient.
+18.	Click Transact once only.
+IMPORTANT: Do not click joinAsClient again. If you do, Remix may show “Already registered” because the same account cannot register twice.
+Step 8: Deposit 10 ETH
+19.	Keep Account 2 selected.
+20.	Scroll to the top area of the Deploy panel and find the Value field.
+21.	Enter: 10
+22.	Select the unit: Ether.
+23.	Scroll to the deployed contract and find deposit.
+24.	Click Transact next to deposit.
+Expected result: The client balance becomes 10 ETH and the contract receives 10 ETH.
+Step 9: Check the Balance After Deposit
+25.	Keep Account 2 selected.
+26.	Click Call next to getBalance. The result should be 10.
+27.	Click Call next to getContractBalance. The result should also be 10.
+NOTE: Call-function results normally appear directly below the function in the Deployed Contracts panel. They do not need to appear in a separate terminal.
+Step 10: IMPORTANT — Change Value to 0 Before Withdrawal
+This is the most important practical detail to remember.
+28.	Go back to the Value field at the top of the Deploy panel.
+29.	Change the Value from 10 to 0.
+30.	Keep the unit as Ether.
+Why? The withdraw function is taking money OUT of the contract. You should not send 10 ETH again when calling withdraw. Leaving Value as 10 can cause the transaction to fail.
+Step 11: Withdraw 5 ETH
+31.	Keep Account 2 selected.
+32.	Find the withdraw(uint256) function.
+33.	In its input box, enter: 5
+34.	Make sure the Value field is still 0 Ether.
+35.	Click Transact.
+Expected result: 5 ETH is withdrawn from the client’s deposited balance.
+Step 12: Check the Final Balance
+36.	Click Call next to getBalance. Expected result: 5.
+37.	Click Call next to getContractBalance. Expected result: 5.
+A result such as “0:uint256: 5” means the function returned the value 5.
+FINAL EXAM FLOW — MEMORIZE THIS
+Create SimpleBank.sol → Paste Code → Compile → Deploy → Set Manager → Select Account 2 → Join as Client → Value = 10 Ether → Deposit → getBalance = 10 → Value = 0 Ether → Enter 5 in withdraw → Withdraw → getBalance = 5
+PART B — UNDERSTANDING THE PRACTICAL
+1. What is this practical doing?
+This is a blockchain-based bank account program. Instead of a normal bank application, the rules are written inside a smart contract. The smart contract stores and executes operations such as depositing money, withdrawing money and checking the balance.
+2. What is a Smart Contract?
+A smart contract is a program written for a blockchain. Once deployed, its functions can be called through blockchain transactions.
+3. What is Solidity?
+Solidity is the programming language used here to write the Ethereum smart contract.
+4. Why do we use Remix IDE?
+Remix IDE lets us write Solidity code, compile it, deploy the smart contract and interact with its functions in one place.
+5. What does Remix VM do?
+Remix VM provides a simulated blockchain environment with test accounts and test ETH. It is useful for demonstrating and testing the contract without using real money.
+6. Main Functions in This Contract
+Function	Purpose
+joinAsClient()	Registers the selected blockchain account as a client.
+deposit()	Accepts ETH and adds the deposited amount to the client balance.
+withdraw(amount)	Withdraws the requested amount if the client has sufficient balance.
+getBalance()	Shows the balance of the currently selected client.
+getContractBalance()	Shows the total ETH currently held by the smart contract.
+setManager(address)	Sets the manager account.
+sendInterest()	Contains additional manager functionality from the contract structure.
+7. Important Concepts Used in the Code
+•	msg.sender: The address of the account currently calling the smart contract.
+•	msg.value: The amount of ETH sent with a payable function call.
+•	payable: Allows an address or function to receive/send ETH.
+•	mapping: Stores data by associating a key with a value; here, an address is associated with a balance.
+•	require(): Checks a condition. If the condition is false, the transaction is reverted.
+•	modifier: Restricts who can call certain functions, such as only the owner, manager or registered clients.
+8. Common Errors and Quick Fixes
+•	“Already registered” — You clicked joinAsClient more than once with the same account. Do not register the same account again.
+•	Withdrawal transaction reverts after a deposit — Check the Value field. Change it to 0 Ether before clicking withdraw.
+•	Only clients can call this — Make sure you selected the account that was registered using joinAsClient.
+•	Insufficient account balance — Do not withdraw more than the amount deposited by that client.
+9. One-Line Viva Explanation
+“I created a Solidity smart contract in Remix IDE, deployed it on Remix VM, registered a client account, deposited 10 ETH, checked the balance, withdrew 5 ETH with the Value field set to 0, and finally verified that the remaining balance was 5 ETH.”
