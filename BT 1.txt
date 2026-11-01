@@ -1,0 +1,66 @@
+Practical: Create Your Own Wallet Using MetaMask for Crypto Transactions
+Aim
+To create a cryptocurrency wallet using MetaMask, select the Sepolia test network, obtain free test ETH, and perform a sample transaction.
+Step-by-Step Procedure
+1. Install MetaMask
+•	Open Google Chrome and visit the official MetaMask website.
+•	Install the MetaMask browser extension.
+2. Create Your Wallet
+•	Open MetaMask.
+•	Choose to create a new wallet and set a password.
+•	Complete the setup. Your first wallet account will appear as Account 1.
+3. Enable Test Networks
+•	Open the network settings or Manage Networks section.
+•	Turn ON the Show test networks option.
+4. Select Sepolia
+•	Return to the wallet dashboard.
+•	Select the Sepolia test network from the available networks.
+5. Copy Your Wallet Address
+•	Locate the address beginning with 0x below Account 1.
+•	Click the copy icon to copy the address.
+6. Get Free Sepolia Test ETH
+•	Open a Sepolia test ETH faucet.
+•	Paste your wallet address and request free test ETH.
+•	Do not use real money or real ETH for this practical.
+•	Wait for the test ETH to appear in MetaMask.
+7. Verify the Balance
+•	Check the MetaMask dashboard.
+•	In our practical execution, the wallet received 0.0500 SepoliaETH.
+8. Create Account 2
+•	Click the account selector next to Account 1.
+•	Choose Add account or Create account.
+•	Create Account 2 and copy its wallet address.
+9. Perform a Transaction
+•	Switch back to Account 1.
+•	Click Send.
+•	Paste Account 2's address.
+•	Enter a small amount, for example 0.01 SepoliaETH.
+•	Review the details and click Confirm/Send.
+10. Verify the Transaction
+•	Wait for confirmation.
+•	Open the Activity section in MetaMask.
+•	Open the transaction to show its status, amount, and transaction details.
+What to Show the External Examiner
+•	Your MetaMask wallet (Account 1).
+•	Sepolia test network selected.
+•	The received Sepolia test ETH balance.
+•	Account 2 created for demonstration.
+•	A successful transaction from Account 1 to Account 2.
+•	The transaction displayed in the Activity section.
+
+
+
+Explanation / Viva Preparation
+What is MetaMask? MetaMask is a digital wallet used to manage blockchain accounts and interact with blockchain applications.
+What is a wallet address? It is a unique public address, typically beginning with 0x for Ethereum accounts, used to receive cryptocurrency.
+
+What is Sepolia? Sepolia is an Ethereum test network used to test transactions without using real ETH.
+What is test ETH? Test ETH is used only for testing on a test network and has no real monetary value.
+
+Why create Account 2? It provides another address so we can safely demonstrate a transaction between two accounts we control.
+
+How do you verify a transaction? Open the Activity section in MetaMask and select the transaction to view its status and details
+
+What is a transaction hash? It is a unique identifier associated with a blockchain transaction.
+Result
+A MetaMask wallet was successfully created, the Sepolia test network was selected, free Sepolia test ETH was received, and a sample transaction was successfully performed between two MetaMask accounts.

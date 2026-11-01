@@ -1,0 +1,234 @@
+
+BLOCKCHAIN TECHNOLOGY PRACTICAL 2
+
+TITLE:
+Write a Smart Contract for a Bank Account of a Customer
+to Perform Deposit Money, Withdraw Money and Show Balance.
+
+STEP 1: OPEN REMIX IDE
+1. Open https://app.remix.live/
+2. Open MetaMask in your browser.
+3. Unlock your MetaMask wallet.
+4. Select Sepolia Test Network in MetaMask.
+5. Make sure your wallet has Sepolia test ETH.
+
+STEP 2: CONNECT REMIX WITH METAMASK
+1. In Remix, click Deploy & Run Transactions.
+2. Open the Environment dropdown.
+3. Select Injected Provider - MetaMask.
+4. MetaMask will show a connection request.
+5. Select your account.
+6. Click Connect.
+7. Check that Remix displays your MetaMask account.
+8. Confirm that the network is Sepolia.
+
+STEP 3: CREATE A SOLIDITY FILE
+1. Click File Explorer in Remix.
+2. Open the contracts folder.
+3. Click New File.
+4. Name the file SimpleBank.sol.
+5. Open the file.
+6. Copy and paste the complete Solidity code given below.
+
+---------------- SOLIDITY CODE ----------------
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract SimpleBank {
+
+    struct ClientAccount {
+        uint clientId;
+        address payable clientAddress;
+        uint balance;
+    }
+
+    ClientAccount[] public clients;
+
+    uint public clientCounter;
+    address public owner;
+    address payable public manager;
+
+    mapping(address => uint) public balances;
+    mapping(address => bool) public isClient;
+
+    constructor() {
+        owner = msg.sender;
+        clientCounter = 0;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only owner can call this!");
+        _;
+    }
+
+    modifier onlyManager() {
+        require(msg.sender == manager, "Only manager can call this!");
+        _;
+    }
+
+    modifier onlyClients() {
+        require(isClient[msg.sender], "Only clients can call this!");
+        _;
+    }
+
+    receive() external payable {}
+
+    function setManager(address payable managerAddress)
+        public
+        onlyOwner
+    {
+        require(managerAddress != address(0), "Invalid manager address");
+        manager = managerAddress;
+    }
+
+    function joinAsClient() public payable {
+        require(!isClient[msg.sender], "Already registered");
+
+        clients.push(
+            ClientAccount(clientCounter, payable(msg.sender), 0)
+        );
+
+        clientCounter++;
+        isClient[msg.sender] = true;
+    }
+
+    function deposit() public payable onlyClients {
+        require(msg.value > 0, "Deposit must be greater than zero");
+
+        balances[msg.sender] += msg.value;
+    }
+
+    function withdraw(uint amount) public onlyClients {
+        uint amountInWei = amount * 1 ether;
+
+        require(amount > 0, "Amount must be greater than zero");
+
+        require(
+            balances[msg.sender] >= amountInWei,
+            "Insufficient account balance"
+        );
+
+        balances[msg.sender] -= amountInWei;
+        payable(msg.sender).transfer(amountInWei);
+    }
+
+    function getBalance() public view onlyClients returns (uint) {
+        return balances[msg.sender] / 1 ether;
+    }
+
+    function getContractBalance() public view returns (uint) {
+        return address(this).balance / 1 ether;
+    }
+
+    function sendInterest() public onlyManager {
+        require(
+            address(this).balance >= clients.length * 1 ether,
+            "Insufficient contract balance"
+        );
+
+        for (uint i = 0; i < clients.length; i++) {
+            address payable clientAddress = clients[i].clientAddress;
+
+            balances[clientAddress] += 1 ether;
+            clientAddress.transfer(1 ether);
+        }
+    }
+}
+
+---------------- END OF CODE ----------------
+
+STEP 4: COMPILE THE CONTRACT
+1. Click Solidity Compiler in the left sidebar.
+2. Select compiler version 0.8.20 or a compatible 0.8.x version.
+3. Click Compile SimpleBank.sol.
+4. Wait for the green compilation success indication.
+
+STEP 5: DEPLOY THE CONTRACT
+1. Open Deploy & Run Transactions.
+2. Select Injected Provider - MetaMask as Environment.
+3. Check that the selected contract is SimpleBank.
+4. Select your first MetaMask account (Account 1).
+5. Click Deploy.
+6. MetaMask will open a transaction confirmation.
+7. Check that the network is Sepolia.
+8. Click Confirm.
+9. Wait for the transaction to be confirmed.
+10. The deployed contract will appear under Deployed Contracts.
+
+STEP 6: SET THE MANAGER
+1. Keep Account 1 selected.
+2. Copy the Account 1 wallet address from Remix.
+3. Find setManager under Deployed Contracts.
+4. Paste the Account 1 address into its input field.
+5. Click Transact.
+6. Confirm the transaction in MetaMask.
+7. Wait for confirmation.
+
+STEP 7: REGISTER A CLIENT
+1. Open MetaMask.
+2. Switch to Account 2.
+3. Make sure Remix also shows Account 2.
+4. Find joinAsClient under Deployed Contracts.
+5. Click Transact.
+6. Confirm the transaction in MetaMask.
+7. Wait for confirmation.
+
+IMPORTANT: Call joinAsClient only once for Account 2.
+
+STEP 8: DEPOSIT 10 ETH
+1. Keep Account 2 selected.
+2. In Remix, find the Value field.
+3. Enter 10.
+4. Select Ether as the unit.
+5. Find deposit under Deployed Contracts.
+6. Click Transact.
+7. Confirm the transaction in MetaMask.
+8. Wait for confirmation.
+
+EXPECTED RESULT:
+The client has deposited 10 ETH.
+
+STEP 9: CHECK THE BALANCE
+1. Keep Account 2 selected.
+2. Find getBalance.
+3. Click Call.
+4. Expected output: 10.
+5. Find getContractBalance.
+6. Click Call.
+7. Expected output: 10.
+
+STEP 10: WITHDRAW 5 ETH
+1. Go back to the Value field in Remix.
+2. Change its value to 0.
+3. Keep the unit as Ether.
+4. Find withdraw under Deployed Contracts.
+5. Enter 5 in the amount input field.
+6. Click Transact.
+7. Confirm the transaction in MetaMask.
+8. Wait for confirmation.
+
+IMPORTANT:
+Value must be 0 Ether before calling withdraw.
+
+STEP 11: CHECK THE FINAL BALANCE
+1. Click getBalance.
+2. Expected output: 5.
+3. Click getContractBalance.
+4. Expected output: 5.
+
+FINAL EXPECTED OUTPUT:
+
+Initial client balance = 0 ETH
+After deposit = 10 ETH
+After withdrawal = 5 ETH
+Final client balance = 5 ETH
+Final contract balance = 5 ETH
+
+CONCLUSION:
+
+Thus, the bank account smart contract was successfully
+created using Solidity and deployed on the Sepolia
+test network through Remix IDE connected with MetaMask.
+The deposit, withdrawal and balance-checking operations
+were successfully performed.
